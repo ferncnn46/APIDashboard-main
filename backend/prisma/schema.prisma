@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model account {
+  accountId    Int            @id @default(autoincrement())
+  createdAt    DateTime       @default(now())
+  username     String         @unique
+  password     String
+  email        String         @unique
+  point        Float          @default(0)
+  isAdmin      Boolean        @default(false)
+  historytopup historytopup[]
+  license      license[]
+  historyslip  historyslip[]
+}
+
+model historyslip {
+  slipId         Int     @id @default(autoincrement())
+  qrCode         String  @unique
+  account        account @relation(references: [accountId], fields: [accountId])
+  accountId      Int
+}
+
+model historytopup {
+  historyId        Int     @id @default(autoincrement())
+  method           method  @default(wallet)
+  code             String
+  amount           Int
+  account          account @relation(references: [accountId], fields: [accountId])
+  accountId        Int
+}
+
+model errorlog{
+  errorId          Int          @id @default(autoincrement())
+  date             DateTime     @default(now())
+  errorMessage     String
+}
+
+model license {
+  licenseid        Int          @id @default(autoincrement())
+  license          String       @unique
+  plan             plan         @default(NotAllow)
+  account          account      @relation(references: [accountId], fields: [accountId])
+  accountId        Int
+}
+
+model paymentconfig {
+  id           Int     @id @default(autoincrement())
+  bankName     String
+  bankAccount  String
+  bankCode     String
+}
+
+// ราคาเต็ม 1
+enum plan {
+  // ยังไม่ได้รับอนุญาต
+  NotAllow
+  // จ่าย 1
+  Basic
+  // จ่าย 0.50
+  Pro
+  // ใช้ฟรี
+  Premium
+}
+
+enum method {
+  wallet
+  bank
+}
+

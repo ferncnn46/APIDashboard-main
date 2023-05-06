@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  db:
+    container_name: db
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: y5OLfH0o&5Xe
+      MYSQL_DATABASE: dashboard_db
+      MYSQL_USER: dashboard_user
+      MYSQL_PASSWORD: NR4m3N&83&On
+      TZ: Asia/Bangkok
+    ports:
+      - "4906:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "4081:80"
+    restart: always
+    environment:
+      PMA_HOST: db
+      TZ: Asia/Bangkok 
+    depends_on:
+      - db
+  frontend:
+    build: ./frontend
+    ports:
+      - "4000:3000"
+  backend:
+    build: ./backend
+    ports:
+      - "4001:3001"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql://dashboard_user:NR4m3N&83&On@db:3306/dashboard_db
+      JWT_SECRET: 4cFy8ZGbZ5BgcaYtuOhQAuLW6p7F5VMi 
